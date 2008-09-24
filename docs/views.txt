@@ -22,6 +22,11 @@ specified in the ``AUTH_PROFILE_MODULE`` setting,
 
 **Optional arguments:**
 
+``extra_context``
+    A dictionary of variables to add to the template context. Any
+    callable object in this dictionary will be called to produce the
+    end result which appears in the context.
+
 ``form_class``
     The form class to use for validating and creating the user
     profile. This form class must define a method named ``save()``,
@@ -71,6 +76,11 @@ been specified in the ``AUTH_PROFILE_MODULE`` setting,
 ``django.contrib.auth.models.SiteProfileNotAvailable`` will be raised.
 
 **Optional arguments:**
+
+``extra_context``
+    A dictionary of variables to add to the template context. Any
+    callable object in this dictionary will be called to produce the
+    end result which appears in the context.
 
 ``form_class``
     The form class to use for validating and editing the user
@@ -124,6 +134,11 @@ If the user has not yet created a profile, ``Http404`` will be raised.
     The username of the user whose profile is being displayed.
 
 **Optional arguments:**
+
+``extra_context``
+    A dictionary of variables to add to the template context. Any
+    callable object in this dictionary will be called to produce the
+    end result which appears in the context.
 
 ``public_profile_field``
     The name of a ``BooleanField`` on the profile model; if the value

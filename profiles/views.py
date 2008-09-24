@@ -19,7 +19,8 @@ from profiles import utils
 
 
 def create_profile(request, form_class=None, success_url=None,
-                   template_name='profiles/create_profile.html'):
+                   template_name='profiles/create_profile.html',
+                   extra_context=None):
     """
     Create a profile for the current user, if one doesn't already
     exist.
@@ -33,6 +34,11 @@ def create_profile(request, form_class=None, success_url=None,
     
     **Optional arguments:**
     
+    ``extra_context``
+        A dictionary of variables to add to the template context. Any
+        callable object in this dictionary will be called to produce
+        the end result which appears in the context.
+
     ``form_class``
         The form class to use for validating and creating the user
         profile. This form class must define a method named
@@ -102,13 +108,21 @@ def create_profile(request, form_class=None, success_url=None,
             return HttpResponseRedirect(success_url)
     else:
         form = form_class()
+    
+    if extra_context is None:
+        extra_context = {}
+    context = RequestContext(request)
+    for key, value in extra_context.items():
+        context[key] = callable(value) and value() or value
+    
     return render_to_response(template_name,
                               { 'form': form },
-                              context_instance=RequestContext(request))
+                              context_instance=context)
 create_profile = login_required(create_profile)
 
 def edit_profile(request, form_class=None, success_url=None,
-                 template_name='profiles/edit_profile.html'):
+                 template_name='profiles/edit_profile.html',
+                 extra_context=None):
     """
     Edit the current user's profile.
     
@@ -121,6 +135,11 @@ def edit_profile(request, form_class=None, success_url=None,
     
     **Optional arguments:**
     
+    ``extra_context``
+        A dictionary of variables to add to the template context. Any
+        callable object in this dictionary will be called to produce
+        the end result which appears in the context.
+
     ``form_class``
         The form class to use for validating and editing the user
         profile. This form class must operate similarly to a standard
@@ -180,14 +199,22 @@ def edit_profile(request, form_class=None, success_url=None,
             return HttpResponseRedirect(success_url)
     else:
         form = form_class(instance=profile_obj)
+    
+    if extra_context is None:
+        extra_context = {}
+    context = RequestContext(request)
+    for key, value in extra_context.items():
+        context[key] = callable(value) and value() or value
+    
     return render_to_response(template_name,
                               { 'form': form,
                                 'profile': profile_obj, },
-                              context_instance=RequestContext(request))
+                              context_instance=context)
 edit_profile = login_required(edit_profile)
 
 def profile_detail(request, username, public_profile_field=None,
-                   template_name='profiles/profile_detail.html'):
+                   template_name='profiles/profile_detail.html',
+                   extra_context=None):
     """
     Detail view of a user's profile.
     
@@ -205,6 +232,11 @@ def profile_detail(request, username, public_profile_field=None,
         The username of the user whose profile is being displayed.
     
     **Optional arguments:**
+
+    ``extra_context``
+        A dictionary of variables to add to the template context. Any
+        callable object in this dictionary will be called to produce
+        the end result which appears in the context.
 
     ``public_profile_field``
         The name of a ``BooleanField`` on the profile model; if the
@@ -242,9 +274,16 @@ def profile_detail(request, username, public_profile_field=None,
     if public_profile_field is not None and \
        not getattr(profile_obj, public_profile_field):
         profile_obj = None
+    
+    if extra_context is None:
+        extra_context = {}
+    context = RequestContext(request)
+    for key, value in extra_context.items():
+        context[key] = callable(value) and value() or value
+    
     return render_to_response(template_name,
                               { 'profile': profile_obj },
-                              context_instance=RequestContext(request))
+                              context_instance=context)
 
 def profile_list(request, public_profile_field=None,
                  template_name='profiles/profile_list.html', **kwargs):
