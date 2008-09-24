@@ -4,8 +4,8 @@ Django user profiles
 
 This is a fairly simple user-profile management application for
 Django_, designed to make the management of site-specific user
-profiles as painless as possible. It requires a recent Subversion
-checkout of Django, and provides a useful complement to
+profiles as painless as possible. It requires a working installation
+of Django 1.0 or newer and provides a useful complement to
 `django-registration`_, but has no other dependencies.
 
 For installation instructions, see the file "INSTALL.txt" in this
