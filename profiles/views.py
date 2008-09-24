@@ -31,37 +31,41 @@ def create_profile(request, form_class=None, success_url=None,
     ``django.contrib.auth.models.SiteProfileNotAvailable`` will be
     raised.
     
-    To specify the form class used for profile creation, pass it as
-    the keyword argument ``form_class``; if this is not supplied, it
-    will fall back to a ``ModelForm`` for the model specified in the
-    ``AUTH_PROFILE_MODULE`` setting.
+    **Optional arguments:**
     
-    If you are supplying your own form class, it must define a method
-    named ``save()`` which corresponds to the signature of ``save()``
-    on ``ModelForm``, because this view will call it with
-    ``commit=False`` and then fill in the relationship to the user
-    (which must be via a field on the profile model named ``user``, a
-    requirement already imposed by ``User.get_profile()``) before
-    finally saving the profile object. If many-to-many relations are
-    involved, the convention established by ``ModelForm`` of
-    looking for a ``save_m2m()`` method on the form is used, and so
-    your form class should define this method.
+    ``form_class``
+        The form class to use for validating and creating the user
+        profile. This form class must define a method named
+        ``save()``, implementing the same argument signature as the
+        ``save()`` method of a standard Django ``ModelForm`` (this
+        view will call ``save(commit=False)`` to obtain the profile
+        object, and fill in the user before the final save). If the
+        profile object includes many-to-many relations, the convention
+        established by ``ModelForm`` of using a method named
+        ``save_m2m()`` will be used, and so your form class should
+        also define this method.
+        
+        If this argument is not supplied, this view will use a
+        ``ModelForm`` automatically generated from the model specified
+        by ``AUTH_PROFILE_MODULE``.
     
-    To specify a URL to redirect to after successful profile creation,
-    pass it as the keyword argument ``success_url``; this will default
-    to the URL of the :view:`profiles.views.profile_detail` view for
-    the new profile if unspecified.
+    ``success_url``
+        The URL to redirect to after successful profile creation. If
+        this argument is not supplied, this will default to the URL of
+        :view:`profiles.views.profile_detail` for the newly-created
+        profile object.
     
-    To specify the template to use, pass it as the keyword argument
-    ``template_name``; this will default to
-    :template:`profiles/create_profile.html` if unspecified.
+    ``template_name``
+        The template to use when displaying the profile-creation
+        form. If not supplied, this will default to
+        :template:`profiles/create_profile.html`.
     
-    Context:
+    **Context:**
     
-    form
+    ``form``
         The profile-creation form.
     
-    Template:
+    **Template:**
     
     ``template_name`` keyword argument, or
     :template:`profiles/create_profile.html`.
@@ -115,35 +119,39 @@ def edit_profile(request, form_class=None, success_url=None,
     ``django.contrib.auth.models.SiteProfileNotAvailable`` will be
     raised.
     
-    To specify the form class used for profile editing, pass it as the
-    keyword argument ``form_class``; this form class must have a
-    ``save()`` method which will save updates to the profile
-    object. If not supplied, this will default to a ``ModelForm`` for
-    the profile model.
+    **Optional arguments:**
     
-    If you supply a form class, its ``__init__()`` method must accept
-    an instance of the profile model as the keyword argument
-    ``instance``, and must implement a method named ``save()`` for
-    updating and saving the profile object from the form's data.
+    ``form_class``
+        The form class to use for validating and editing the user
+        profile. This form class must operate similarly to a standard
+        Django ``ModelForm`` in that it must accept an instance of the
+        object to be edited as the keyword argument ``instance`` to
+        its constructor, and it must implement a method named
+        ``save()`` which will save the updates to the object. If this
+        argument is not specified, this view will use a ``ModelForm``
+        generated from the model specified in the
+        ``AUTH_PROFILE_MODULE`` setting.
     
-    To specify the URL to redirect to following a successful edit,
-    pass it as the keyword argument ``success_url``; this will default
-    to the URL of the :view:`profiles.views.profile_detail` view if
-    not supplied.
+    ``success_url``
+        The URL to redirect to following a successful edit. If not
+        specified, this will default to the URL of
+        :view:`profiles.views.profile_detail` for the profile object
+        being edited.
     
-    To specify the template to use, pass it as the keyword argument
-    ``template_name``; this will default to
-    :template:`profiles/edit_profile.html` if not supplied.
+    ``template_name``
+        The template to use when displaying the profile-editing
+        form. If not specified, this will default to
+        :template:`profiles/edit_profile.html`.
     
-    Context:
+    **Context:**
     
-    form
+    ``form``
         The form for editing the profile.
         
-    profile
+    ``profile``
          The user's current profile.
     
-    Template:
+    **Template:**
     
     ``template_name`` keyword argument or
     :template:`profiles/edit_profile.html`.
@@ -191,26 +199,36 @@ def profile_detail(request, username, public_profile_field=None,
     If the user has not yet created a profile, ``Http404`` will be
     raised.
     
-    If a field on the profile model determines whether the profile can
-    be publicly viewed, pass the name of that field (as a string) as
-    the keyword argument ``public_profile_field``; that attribute will
-    be checked before displaying the profile, and if it does not
-    return a ``True`` value, the ``profile`` variable in the template
-    will be ``None``. As a result, this field must be a
-    ``BooleanField``.
+    **Required arguments:**
     
-    To specify the template to use, pass it as the keyword argument
-    ``template_name``; this will default to
-    :template:`profiles/profile_detail.html` if not supplied.
+    ``username``
+        The username of the user whose profile is being displayed.
     
-    Context:
+    **Optional arguments:**
+
+    ``public_profile_field``
+        The name of a ``BooleanField`` on the profile model; if the
+        value of that field on the user's profile is ``False``, the
+        ``profile`` variable in the template will be ``None``. Use
+        this feature to allow users to mark their profiles as not
+        being publicly viewable.
+        
+        If this argument is not specified, it will be assumed that all
+        users' profiles are publicly viewable.
     
-    profile
+    ``template_name``
+        The name of the template to use for displaying the profile. If
+        not specified, this will default to
+        :template:`profiles/profile_detail.html`.
+    
+    **Context:**
+    
+    ``profile``
         The user's profile, or ``None`` if the user's profile is not
-        publicly viewable (see the note about ``public_profile_field``
-        above).
+        publicly viewable (see the description of
+        ``public_profile_field`` above).
     
-    Template:
+    **Template:**
     
     ``template_name`` keyword argument or
     :template:`profiles/profile_detail.html`.
@@ -237,26 +255,37 @@ def profile_list(request, public_profile_field=None,
     ``AUTH_PROFILE_MODULE`` setting,
     ``django.contrib.auth.models.SiteProfileNotAvailable`` will be
     raised.
+
+    **Optional arguments:**
+
+    ``public_profile_field``
+        The name of a ``BooleanField`` on the profile model; if the
+        value of that field on a user's profile is ``False``, that
+        profile will be excluded from the list. Use this feature to
+        allow users to mark their profiles as not being publicly
+        viewable.
+        
+        If this argument is not specified, it will be assumed that all
+        users' profiles are publicly viewable.
     
-    If a field on the profile model determines whether the profile can
-    be publicly viewed, pass the name of that field as the keyword
-    argument ``public_profile_field``; the ``QuerySet`` of profiles
-    will be filtered to include only those on which that field is
-    ``True`` (as a result, this field must be a ``BooleanField``).
+    ``template_name``
+        The name of the template to use for displaying the profiles. If
+        not specified, this will default to
+        :template:`profiles/profile_list.html`.
+
+    Additionally, all arguments accepted by the
+    :view:`django.views.generic.list_detail.object_list` generic view
+    will be accepted here, and applied in the same fashion, with one
+    exception: ``queryset`` will always be the ``QuerySet`` of the
+    model specified by the ``AUTH_PROFILE_MODULE`` setting, optionally
+    filtered to remove non-publicly-viewable proiles.
     
-    This view is a wrapper around the
-    :view:`django.views.generic.list_detail.object_list` generic view,
-    so any arguments which are legal for that view will be accepted,
-    with the exception of ``queryset``, which will always be set to
-    the default ``QuerySet`` of the profile model, optionally filtered
-    as described above.
-    
-    Context:
+    **Context:**
     
     Same as the :view:`django.views.generic.list_detail.object_list`
     generic view.
     
-    Template:
+    **Template:**
     
     ``template_name`` keyword argument or
     :template:`profiles/profile_list.html`.
