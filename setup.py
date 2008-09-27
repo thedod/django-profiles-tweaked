@@ -1,6 +1,6 @@
 from distutils.core import setup
 
-setup(name='profiles',
+setup(name='django-profiles',
       version='0.1',
       description='User-profile application for Django',
       author='James Bennett',
