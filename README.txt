@@ -15,4 +15,4 @@ directory.
 
 
 .. _Django: http://www.djangoproject.com/
-.. _django-registration: http://code.google.com/p/django-registration/
+.. _django-registration: http://www.bitbucket.org/ubernostrum/django-registration/wiki/
