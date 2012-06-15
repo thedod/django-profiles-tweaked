@@ -290,6 +290,7 @@ def profile_detail(request, username, public_profile_field=None,
 def self_detail(request):
     return HttpResponseRedirect(reverse('profiles_profile_detail',
         kwargs={ 'username': request.user.username }))
+self_detail = login_required(self_detail)
 
 def profile_list(request, public_profile_field=None,
                  template_name='profiles/profile_list.html', **kwargs):
