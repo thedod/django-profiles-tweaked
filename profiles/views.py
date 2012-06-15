@@ -269,8 +269,11 @@ def profile_detail(request, username, public_profile_field=None,
     try:
         profile_obj = user.get_profile()
     except ObjectDoesNotExist:
+        if user == request.user:
+            return HttpResponseRedirect(reverse('profiles_create_profile'))
         raise Http404
-    if public_profile_field is not None and \
+    if user != request.user and \
+       public_profile_field is not None and \
        not getattr(profile_obj, public_profile_field):
         profile_obj = None
     
@@ -283,6 +286,10 @@ def profile_detail(request, username, public_profile_field=None,
     return render_to_response(template_name,
                               { 'profile': profile_obj },
                               context_instance=context)
+
+def self_detail(request):
+    return HttpResponseRedirect(reverse('profiles_profile_detail',
+        kwargs={ 'username': request.user.username }))
 
 def profile_list(request, public_profile_field=None,
                  template_name='profiles/profile_list.html', **kwargs):
