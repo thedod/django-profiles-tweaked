@@ -239,13 +239,21 @@ def profile_detail(request, username, public_profile_field=None,
 
     ``public_profile_field``
         The name of a ``BooleanField`` on the profile model; if the
-        value of that field on the user's profile is ``False``, the
-        ``profile`` variable in the template will be ``None``. Use
-        this feature to allow users to mark their profiles as not
+        value of that field on another user's profile is ``False``, an
+        ``Http404`` is raised (to dicourage fishing expeditions).
+        Use this feature to allow users to mark their profiles as not
         being publicly viewable.
-        
+
         If this argument is not specified, it will be assumed that all
         users' profiles are publicly viewable.
+
+        If you wish *all* profiles to be private, instead of using
+        a ``BooleanField``, use a property that returns False like this:
+            class MyProfile(models.Model):
+                ...
+                is_public = property(lambda obj:False)
+
+        
     
     ``template_name``
         The name of the template to use for displaying the profile. If
@@ -275,7 +283,7 @@ def profile_detail(request, username, public_profile_field=None,
     if user != request.user and \
        public_profile_field is not None and \
        not getattr(profile_obj, public_profile_field):
-        profile_obj = None
+            raise Http404 # dicourage fishing expeditions
     
     if extra_context is None:
         extra_context = {}
@@ -313,6 +321,12 @@ def profile_list(request, public_profile_field=None,
         
         If this argument is not specified, it will be assumed that all
         users' profiles are publicly viewable.
+
+        If you wish *all* profiles to be private, instead of using
+        a ``BooleanField``, use a property that returns False like this:
+            class MyProfile(models.Model):
+                ...
+                is_public = property(lambda obj:False)
     
     ``template_name``
         The name of the template to use for displaying the profiles. If
